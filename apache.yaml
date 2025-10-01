@@ -3,6 +3,11 @@
 - hosts: all
   become: true
   tasks:
+
+  - name: update cache
+    yum: 
+      update_cache: true
   - name: apache 2 install 
     yum: 
-      name: apache2
+      name: httpd
+      state: latest
