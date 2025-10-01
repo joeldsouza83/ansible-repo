@@ -1,0 +1,10 @@
+---
+
+- hosts: all
+  become: true
+  tasks:
+  - name: update python
+    yum: 
+      name: python
+      state: latest
+      when: ansible_distribution == "Amazon" 
