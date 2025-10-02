@@ -1,0 +1,9 @@
+---
+- hosts: all
+  become: true
+  pre_tasks: 
+  - name: check and create dirs
+    file:
+      path: /efs
+      state: directory
+      mode: "0755"

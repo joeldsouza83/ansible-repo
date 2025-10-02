@@ -1,0 +1,25 @@
+---
+- hosts: all
+  become: true
+  tasks: 
+  - name: Download s3 rpm 
+    shell: wget -P /tmp/ https://s3.amazonaws.com/mountpoint-s3-release/latest/x86_64/mount-s3.rpm 
+  - name: change permission     
+    file:
+      path: /tmp/mount-s3.rpm
+      owner: root
+  - name: install dependency fuse
+    package:
+      name: fuse
+      state: latest
+  - name: rpg key
+    rpm_key:
+      state: absent
+      key: https://s3.amazonaws.com/mountpoint-s3-release/public_keys/KEYS
+
+  - name: Install S3 package
+    package:
+      name: /tmp/mount-s3.rpm
+      state: present
+      disable_gpg_check: yes
+
