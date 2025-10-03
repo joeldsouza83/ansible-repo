@@ -1,0 +1,6 @@
+[db-server]
+172.31.16.119
+[file-server]
+172.31.16.104
+[ansible-server]
+172.31.22.95
