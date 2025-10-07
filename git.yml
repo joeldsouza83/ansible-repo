@@ -1,0 +1,8 @@
+- hosts: all
+  become: true
+  tasks:
+    - name: Install latest git
+      package:
+        name: git
+        state: latest
+        update_cache: yes
