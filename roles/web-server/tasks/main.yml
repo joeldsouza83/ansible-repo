@@ -1,0 +1,4 @@
+- name: install apache httpd
+  package: 
+    name: httpd
+    state: latest

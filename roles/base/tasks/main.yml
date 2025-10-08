@@ -1,0 +1,5 @@
+- name: Install git on all servers
+  package: 
+    name: git
+    state: latest
+

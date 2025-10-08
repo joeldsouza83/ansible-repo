@@ -1,0 +1,28 @@
+---
+
+- hosts: all 
+  become: true
+  tasks: 
+  - name: update cache
+    package: 
+      update_cache: yes
+
+- hosts: all
+  become: true
+  roles:
+    - base
+
+- hosts: db-server
+  become: true
+  roles:
+    - db-server
+
+- hosts: web-server
+  become: true
+  roles:
+   - web-server
+
+- hosts: file-server
+  become: true
+  roles:
+    - file-server

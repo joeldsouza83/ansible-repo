@@ -1,0 +1,4 @@
+- name: install mariadb on db-server
+  package: 
+    name: mariadb105-server
+    state: latest
