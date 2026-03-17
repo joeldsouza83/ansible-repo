@@ -1,0 +1,10 @@
+---
+- hosts: workers
+  become: true
+  roles:
+    - worker
+
+- hosts: master
+  become: true
+  roles:
+    - master

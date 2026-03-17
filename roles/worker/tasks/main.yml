@@ -1,0 +1,24 @@
+---
+- hosts: workers
+  become: true
+  pre_tasks:
+  - name: create dir
+    ansible.builtin.file:
+      path: /worker/
+      state: directory
+      mode: 0775
+  - name: create dir to download node exporter
+    ansible.builtin.get_url:
+      url: https://github.com/prometheus/node_exporter/releases/download/v1.10.2/node_exporter-1.10.2.linux-amd64.tar.gz
+      dest: /worker/
+  tasks:
+  - name: extract zip file
+    ansible.builtin.unarchive:
+      src: /worker/node_exporter-1.10.2.linux-amd64.tar.gz
+      dest: /worker/
+      remote_src: yes
+  - name: run node_exporter 
+    ansible.builtin.shell: |
+      cd /worker/node_exporter-1.10.2
+      ./node_exporter &
+

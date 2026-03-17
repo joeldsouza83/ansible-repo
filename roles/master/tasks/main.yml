@@ -1,0 +1,67 @@
+---
+- hosts: master 
+  become: true
+  pre_tasks:
+  - name: create dir
+    ansible.builtin.file:
+      path: /master/
+      state: directory
+      mode: 0775
+      owner: root
+  - name: create dir to download node exporter
+    ansible.builtin.get_url:
+      url: "{{ item }}"
+      dest: /master/
+    loop:
+      - "https://github.com/prometheus/prometheus/releases/download/v3.10.0/prometheus-3.10.0.linux-amd64.tar.gz" 
+      - "https://github.com/prometheus/node_exporter/releases/download/v1.10.2/node_exporter-1.10.2.linux-amd64.tar.gz"
+  tasks:
+  - name: extract zip file
+    ansible.builtin.unarchive:
+      src: "{{ item }}"
+      dest: /master/
+      remote_src: yes
+    loop:
+      - /master/prometheus-3.10.0.linux-amd64.tar.gz
+      - /master/node_exporter-1.10.2.linux-amd64.tar.gz
+
+  - name: start node_exporter && Prometheus
+    ansible.builtin.shell: |
+      pkill prometheus node_exporter 
+      cd /master/prometheus-3.10.0.linux-amd64
+      ./prometheus --config.file=prometheus.yml &
+      cd /master/node_exporter-1.10.2.linux-amd64
+      ./node_exporter &
+      
+  - name: Add Grafana repository
+    ansible.builtin.shell: |
+      cat <<EOF > /etc/yum.repos.d/grafana.repo
+      [grafana]
+      name=Grafana
+      baseurl=https://packages.grafana.com/oss/rpm
+      repo_gpgcheck=1
+      enabled=1
+      gpgcheck=1
+      gpgkey=https://packages.grafana.com/gpg.key
+      EOF
+  - name: install grafana
+    ansible.builtin.dnf:
+      name: grafana
+      state: present
+
+  - name: enable and start grafana service  
+    ansible.builtin.systemd_service:
+      name: grafana-server
+      state: started
+      enabled: yes
+  
+  - name: Generate prometheus config
+    ansible.builtin.template:
+      src: prometheus.yml.j2
+      dest: /master/prometheus-3.10.0.linux-amd64/prometheus.yml
+  
+  - name: restart prometheus 
+    ansible.builtin.shell: |
+      pkill prometheus && cd /master/prometheus-3.10.0.linux-amd64 &&  ./prometheus --config.file=prometheus.yml &
+
+      
